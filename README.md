@@ -1,114 +1,153 @@
-gmpcrac
+# get_next_line - File Descriptor Line Reader
 
-# Get Next Line
+A custom implementation for reading lines from file descriptors, developed as part of the 42 School curriculum operating on file descriptors (`int`) rather than `FILE*` streams, and follows 42's specific project requirements.
 
-A C function that reads a line from a file descriptor, handling both static files and standard input with dynamic buffer size management.
+> 📌 **Important Note**: This implementation is designed specifically for 42's "get_next_line" project requirements. It should not be confused with the standard C library's `getline()` function which works with `FILE*` streams.
 
-## 📋 Description
+## Overview
+This project implements a line-by-line reader for file descriptors using advanced C concepts including:
+- Static variables for state persistence
+- Linked list buffer management
+- Strict memory management with no leaks
+- Configurable buffer sizes
+- Multiple file descriptor support (bonus)
 
-This project implements a function `get_next_line` that returns one line at a time from a file descriptor. It demonstrates efficient memory management and proper handling of file reading operations using static variables to maintain state between function calls.
+## Features
+| Feature | Mandatory | Bonus |
+|---------|-----------|-------|
+| Reads lines from file descriptors | ✓ | ✓ |
+| Handles multiple file descriptors simultaneously | ✗ | ✓ |
+| Configurable buffer size via `-D BUFFER_SIZE` | ✓ | ✓ |
+| Proper memory management (Valgrind-clean) | ✓ | ✓ |
+| Handles stdin, files, pipes, and sockets | ✓ | ✓ |
+| Returns lines with trailing `\n` (except EOF) | ✓ | ✓ |
+| Norm-compliant code (42 School standards) | ✓ | ✓ |
 
-### Features
-- Reads from any file descriptor (files, stdin, etc.)
-- Handles variable buffer sizes through compile-time definition
-- Properly manages memory with no leaks
-- Includes both mandatory and bonus implementations
-- Bonus version supports multiple file descriptors simultaneously
-
-## 🏗️ Project Structure
-
+## Project Structure
 ```
 get_next_line/
+├── get_next_line.c        # Mandatory implementation
+├── get_next_line_bonus.c  # Bonus implementation
 ├── includes/
-│   ├── get_next_line.h          # Main header
-│   └── get_next_line_bonus.h    # Bonus header
-├── utils/
-│   ├── get_next_line_utils.c    # Helper functions
-│   └── get_next_line_utils_bonus.c  # Bonus helpers
-├── get_next_line.c              # Main implementation
-├── get_next_line_bonus.c        # Bonus implementation
-└── Makefile
+│   ├── get_next_line.h    # Mandatory header
+│   └── get_next_line_bonus.h # Bonus header
+└── utils/
+    ├── get_next_line_utils.c      # Mandatory helper functions
+    └── get_next_line_utils_bonus.c # Bonus helper functions
 ```
 
-## 🔧 Compilation
-
-### Mandatory Part
+## Compilation
+### Mandatory Version
 ```bash
-cc -Wall -Wextra -Werror -D BUFFER_SIZE=<size> get_next_line.c get_next_line_utils.c
+cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 -I includes get_next_line.c utils/get_next_line_utils.c -o gnl
 ```
 
-### Bonus Part
+### Bonus Version
 ```bash
-cc -Wall -Wextra -Werror -D BUFFER_SIZE=<size> get_next_line_bonus.c get_next_line_utils_bonus.c
+cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 -I includes get_next_line_bonus.c utils/get_next_line_utils_bonus.c -o gnl_bonus
 ```
 
-### Using Makefile
-```bash
-make        # Compiles mandatory version
-make bonus  # Compiles bonus version
-make clean  # Removes object files
-make fclean # Removes object files and compiled binaries
-make re     # Recompiles project
-```
+> 💡 **Buffer Size Notes**:
+> - Test with various sizes: `1`, `42`, `4096`, `1000000`
+> - Always use `-I includes` to locate header files
+> - For real-world use, `4096` is recommended (typical system buffer size)
 
-## 📝 Usage
-
+## Usage Examples
+### Mandatory Version
 ```c
-#include "get_next_line.h"  // or "get_next_line_bonus.h" for bonus
+#include "get_next_line.h"
+#include <fcntl.h>
+#include <stdio.h>
 
-int main(void)
-{
-    int fd = open("file.txt", O_RDONLY);
+int main(void) {
+    int fd = open("input.txt", O_RDONLY);
     char *line;
     
-    while ((line = get_next_line(fd)) != NULL)
-    {
+    while ((line = get_next_line(fd)) != NULL) {
         printf("%s", line);
         free(line);
     }
     close(fd);
-    return (0);
+    return 0;
 }
 ```
 
-## ⚙️ Parameters
+### Bonus Version (Multiple FDs)
+```c
+#include "get_next_line_bonus.h"
+#include <fcntl.h>
+#include <stdio.h>
 
-- `fd`: File descriptor to read from
-- `BUFFER_SIZE`: Compile-time buffer size definition (default if not specified)
+int main(void) {
+    int fd1 = open("file1.txt", O_RDONLY);
+    int fd2 = open("file2.txt", O_RDONLY);
+    char *line;
+    
+    // Read from first descriptor
+    while ((line = get_next_line(fd1)) != NULL) {
+        printf("FD1: %s", line);
+        free(line);
+    }
+    
+    // Read from second descriptor
+    while ((line = get_next_line(fd2)) != NULL) {
+        printf("FD2: %s", line);
+        free(line);
+    }
+    
+    close(fd1);
+    close(fd2);
+    return 0;
+}
+```
 
-## 📤 Return Value
+## Technical Implementation
+### Core Concepts
+- **Static Variable Management**:
+  - Mandatory: Single static linked list per file descriptor
+  - Bonus: Static array of linked lists indexed by file descriptor (`static t_list *lists[OPEN_MAX]`)
+  
+- **Buffer Handling**:
+  - Reads in chunks of `BUFFER_SIZE` (configurable at compile time)
+  - Only processes data when newline is detected
+  - Maintains partial lines between calls using linked list nodes
 
-- Returns the read line (including terminating '\n' character)
-- Returns NULL if there's nothing left to read or if an error occurs
+- **Memory Safety**:
+  - All allocations properly freed via `free_the_list()`
+  - No memory leaks (verified with Valgrind)
+  - Strict error checking for all system calls
 
-## 🚫 Restrictions
+- **Edge Case Handling**:
+  - Empty files
+  - Files without trailing newlines
+  - Very large lines (>1MB)
+  - Multiple concurrent file descriptors (bonus)
+  - Standard input (pipes and redirection)
 
-- No global variables allowed
-- No use of `libft` library
-- `lseek()` function is forbidden
-- Must handle variable BUFFER_SIZE values (from 1 to very large numbers)
+## Testing
+Verified against these scenarios:
+- ✅ All buffer sizes (1-1M+)
+- ✅ Multiple file descriptors simultaneously (bonus)
+- ✅ Standard input via pipes (`cat file | ./program`)
+- ✅ Files with/without trailing newlines
+- ✅ Large files (10MB+)
+- ✅ Empty files
+- ✅ Binary files (undefined behavior as per project spec)
+- ✅ Valgrind memory leak checks (0 leaks detected)
+- ✅ Norm compliance (42 School standards)
 
-## 🏆 Bonus Features
+## Why This Isn't `getline()`
+| Feature | Our `get_next_line` | POSIX `getline()` |
+|---------|---------------------|-------------------|
+| Input Type | File descriptor (`int`) | `FILE*` stream |
+| Return Type | `char*` (line buffer) | `ssize_t` (byte count) |
+| Buffer Management | Manual allocation/freedom | Caller provides `char**` |
+| Standard Compliance | 42 School project spec | POSIX standard |
+| Error Handling | Returns `NULL` on error | Returns `-1` on error |
 
-The bonus implementation adds:
-- Single static variable usage
-- Multiple file descriptor support
-- Ability to switch between different file descriptors without losing reading state
+## Author
+Ani Hambardzumyan  
+Computer Science student at American University of Armenia & 42 Yerevan
+## License
+This project is part of the 42 School curriculum and is intended for educational purposes only. It adheres to 42 School's academic guidelines and may not be used commercially without permission.
 
-## 📚 Testing
-
-The function should be tested with:
-- Different BUFFER_SIZE values (1, 10, 100, 1000000, etc.)
-- Various file types (text files, empty files, etc.)
-- Standard input
-- Multiple file descriptors simultaneously (bonus)
-- Binary files (undefined behavior but should not crash)
-
-## 📝 Notes
-
-- The function maintains reading state between calls using static variables
-- Memory is properly freed when appropriate
-- The implementation is efficient, reading only as much as necessary each call
-- The bonus version can manage multiple file descriptors at once
-
-This project demonstrates understanding of file I/O operations, memory management, and static variables in C programming.
