@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anihamba <anihamba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anihamba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 15:02:51 by anihamba          #+#    #+#             */
-/*   Updated: 2025/04/16 14:20:22 by anihamba         ###   ########.fr       */
+/*   Updated: 2025/09/13 13:17:54 by anihamba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "includes/get_next_line.h"
 
 void	append(t_list **list, char *buf)
 {

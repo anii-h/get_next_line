@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anihamba <anihamba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anihamba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 15:51:49 by anihamba          #+#    #+#             */
-/*   Updated: 2025/04/16 14:16:05 by anihamba         ###   ########.fr       */
+/*   Updated: 2025/09/13 13:16:35 by anihamba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "includes/get_next_line_bonus.h"
 
 void	append(t_list **list, char *buf)
 {

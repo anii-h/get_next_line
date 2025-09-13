@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anihamba <anihamba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anihamba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 15:06:49 by anihamba          #+#    #+#             */
-/*   Updated: 2025/04/16 12:13:43 by ani              ###   ########.fr       */
+/*   Updated: 2025/09/13 13:17:05 by anihamba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "../includes/get_next_line.h"
 
 t_list	*find_last_node(t_list *list)
 {

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anihamba <anihamba@student.42.fr>          +#+  +:+       +#+        */
+/*   By: anihamba <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 15:06:49 by anihamba          #+#    #+#             */
-/*   Updated: 2025/04/16 13:10:22 by ani              ###   ########.fr       */
+/*   Updated: 2025/09/13 13:16:55 by anihamba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "../includes/get_next_line_bonus.h"
 
 t_list	*find_last_node(t_list *list)
 {
